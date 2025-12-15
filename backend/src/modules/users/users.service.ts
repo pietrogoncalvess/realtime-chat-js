@@ -12,6 +12,11 @@ class UsersService {
     return user;
   }
 
+  async findById(id: string): Promise<InstanceType<typeof User> | null> {
+    const user = await User.findById(id);
+    return user;
+  }
+
   async create({ name, username, password }: ICreateUserDTO): Promise<InstanceType<typeof User>> {
     const userAlreadyExists = await this.findByUsername(username);
 

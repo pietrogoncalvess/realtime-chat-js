@@ -1,11 +1,9 @@
 import { Schema, model } from "mongoose";
 
-const MessageSchema = new Schema({
-  from: String,
-  to: String,
-  message: String,
+const UserStatusSchema = new Schema({
+  userId: String,
   updatedAt: { type: Date, default: Date.now },
   createdAt: { type: Date, default: Date.now },
 });
 
-export const Message = model("Message", MessageSchema);
+export const UserStatus = model("UserStatus", UserStatusSchema);

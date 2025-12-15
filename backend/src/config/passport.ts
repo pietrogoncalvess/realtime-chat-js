@@ -2,6 +2,7 @@ import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import bcrypt from "bcryptjs";
 import { User } from "../models/User";
+import { UserStatus } from "../models/UserStatus";
 
 passport.use(
   new LocalStrategy({ usernameField: "username", passwordField: "password" }, async (username, password, done) => {
@@ -19,6 +20,8 @@ passport.use(
         return done(null, false, { message });
       }
 
+      UserStatus.findOneAndUpdate({ userId: user.id }, { $set: { userId: user.id } }, { upsert: true, new: true }).exec();
+
       return done(null, user);
     } catch (err) {
       return done(err);
@@ -32,7 +35,11 @@ passport.serializeUser((user: any, done) => {
 
 passport.deserializeUser((id: string, done) => {
   User.findById(id)
-    .then((user) => done(null, user))
+    .then((user) => {
+      UserStatus.deleteOne({ userId: id }).exec();
+
+      done(null, user);
+    })
     .catch((err) => done(err));
 });
 
