@@ -1,6 +1,6 @@
-import { IsEmail, IsString, MinLength } from "class-validator";
+import { IsString, MinLength } from "class-validator";
 
-class CreateUserDTO {
+class CreateUserDTO implements ICreateUserDTO {
   @IsString()
   name!: string;
 
@@ -8,8 +8,14 @@ class CreateUserDTO {
   @MinLength(6)
   password!: string;
 
-  @IsEmail()
-  email!: string;
+  @IsString()
+  username!: string;
 }
 
-export { CreateUserDTO };
+interface ICreateUserDTO {
+  name: string;
+  password: string;
+  username: string;
+}
+
+export { CreateUserDTO, ICreateUserDTO };

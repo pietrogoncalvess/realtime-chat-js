@@ -1,23 +1,26 @@
 import { Request, response, Response } from "express";
-import { container } from "tsyringe";
+import { container, inject, injectable } from "tsyringe";
 import { validateBody } from "../../utils";
 import { CreateUserDTO } from "./dtos/createUserDTO";
+import { UsersService } from "./users.service";
 
+@injectable()
 class UsersController {
+  constructor(
+    @inject(UsersService)
+    private readonly usersService: UsersService
+  ) {}
+
   async create(request: Request, response: Response): Promise<Response> {
-    const body = await validateBody(request.body, CreateUserDTO);
-    const teste = "";
-    // const createUserUseCase = container.resolve(CreateUserUseCase)
+    try {
+      const body = await validateBody(request.body, CreateUserDTO);
 
-    // await createUserUseCase.execute(
-    //   {
-    //     name,
-    //     email,
-    //     password,
-    //     driver_license
-    //   });
+      const user = await this.usersService.create(body);
 
-    return response.status(201).send();
+      return response.status(201).json(user);
+    } catch (error) {
+      return response.status(400).json({ message: (error as Error).message });
+    }
   }
 }
 

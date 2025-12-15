@@ -1,20 +1,19 @@
-import { inject, injectable } from "tsyringe";
+import { injectable } from "tsyringe";
 import { hash } from "bcryptjs";
 import { User } from "../../models/User";
-import type { Document } from "mongoose";
+import { ICreateUserDTO } from "./dtos/createUserDTO";
 
 @injectable()
 class UsersService {
   constructor() {}
 
-  async findByEmail(email: string): Promise<InstanceType<typeof User> | null> {
-    const user = await User.findOne({ email });
+  async findByUsername(username: string): Promise<InstanceType<typeof User> | null> {
+    const user = await User.findOne({ username });
     return user;
   }
 
-  async create({ name, driver_license, email, password }: any): Promise<void> {
-    //   async create({ name, driver_license, email, password }: CreateUserDTO): Promise<void> {
-    const userAlreadyExists = await this.findByEmail(email);
+  async create({ name, username, password }: ICreateUserDTO): Promise<InstanceType<typeof User>> {
+    const userAlreadyExists = await this.findByUsername(username);
 
     if (userAlreadyExists) {
       throw new Error("User already exists");
@@ -22,11 +21,17 @@ class UsersService {
 
     const passwordHash = await hash(password, 8);
 
-    await User.create({
-      name,
-      email,
-      password: passwordHash,
-    });
+    const user = (
+      await User.create({
+        name,
+        username,
+        password: passwordHash,
+      })
+    ).toObject();
+
+    delete user.password;
+
+    return user as InstanceType<typeof User>;
   }
 }
 
