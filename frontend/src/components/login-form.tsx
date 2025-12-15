@@ -85,13 +85,6 @@ export function LoginForm() {
               </div>
             </div>
 
-            <div className="flex items-center space-x-2">
-              <Checkbox id="remember" />
-              <label htmlFor="remember" className="text-sm text-gray-600">
-                Continuar conectado
-              </label>
-            </div>
-
             {error && <p className="text-sm text-red-600 text-center">{error}</p>}
 
             <Button type="submit" disabled={loading} className="w-full h-12 rounded-full">

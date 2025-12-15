@@ -1,19 +1,51 @@
 import "reflect-metadata";
+import cluster from "node:cluster";
+import os from "node:os";
 import http from "http";
 import { Server } from "socket.io";
-import app from "./app";
 import { connectDB } from "./config/db";
+import { setSocketServer } from "./shared/socket/socket.provider";
+import { createSessionMiddleware } from "./config/session";
+import { createApp } from "./app";
+import { User } from "./models/User";
+import { hash } from "bcryptjs";
 
-connectDB();
+const PORT = 3333;
 
-const server = http.createServer(app);
+async function bootstrap() {
+  await connectDB();
 
-export const io = new Server(server, {
-  cors: {
-    origin: "http://localhost:3000",
-    credentials: true,
-    methods: ["GET", "POST"],
-  },
-});
+  const sessionMiddleware = createSessionMiddleware();
 
-server.listen(3333, () => console.log("Backend rodando na porta 3333"));
+  const app = createApp(sessionMiddleware);
+
+  const server = http.createServer(app);
+
+  const io = new Server(server, {
+    cors: {
+      origin: "http://localhost:3000",
+      credentials: true,
+    },
+  });
+
+  setSocketServer(io);
+
+  server.listen(PORT, () => {
+    console.log(`Worker ${process.pid} rodando na porta ${PORT}`);
+  });
+}
+
+if (cluster.isPrimary) {
+  const numCPUs = os.cpus().length;
+
+  for (let i = 0; i < numCPUs; i++) {
+    cluster.fork();
+  }
+
+  cluster.on("exit", (worker) => {
+    console.log(`Worker ${worker.process.pid} morreu. Criando outro...`);
+    cluster.fork();
+  });
+} else {
+  bootstrap();
+}

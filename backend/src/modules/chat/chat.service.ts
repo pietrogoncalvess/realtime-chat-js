@@ -3,7 +3,7 @@ import { Message } from "../../models/Message";
 import { ICreateMessageDTO } from "./dtos/createMessageDTO";
 import { UsersService } from "../users/users.service";
 import { isValidObjectId } from "mongoose";
-import { io } from "../../server";
+import { getSocketServer } from "../../shared/socket/socket.provider";
 
 @injectable()
 class ChatService {
@@ -34,6 +34,7 @@ class ChatService {
 
     const message = Message.create(data);
 
+    const io = getSocketServer();
     io.emit("receive_message", data);
 
     return message;

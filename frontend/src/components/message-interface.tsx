@@ -8,6 +8,7 @@ import { ArrowRight } from "lucide-react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { socket } from "@/services/socket";
+import { toast } from "sonner";
 
 interface User {
   _id: string;
@@ -40,13 +41,24 @@ export function MessageInterface() {
     getMeInfo();
 
     socket.connect();
+    socket.off("receive_message");
     socket.on("receive_message", (data: Message) => {
-      const isChatSelected = data.from === selectedChatRef.current?._id || data.to === selectedChatRef.current?._id;
-      const isMyMessage = data.from === meRef.current?._id;
+      if (!meRef.current || !selectedChatRef.current) return;
 
-      if (isChatSelected && !isMyMessage) {
-        appendMessage(data);
+      if (data.from === meRef.current._id) {
+        return;
       }
+
+      const belongsToSelectedChat = data.from === selectedChatRef.current._id && data.to === meRef.current._id;
+
+      if (belongsToSelectedChat) {
+        appendMessage(data);
+        return;
+      }
+
+      toast("Nova mensagem", {
+        description: data.message,
+      });
     });
 
     return () => {
@@ -123,7 +135,9 @@ export function MessageInterface() {
   };
 
   const appendMessage = (message: Message) => {
-    setMessages((prev) => [...prev, message]);
+    setMessages((prev) => {
+      return [...prev, message];
+    });
   };
 
   const scrollToBottom = () => {

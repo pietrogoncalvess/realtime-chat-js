@@ -9,7 +9,10 @@ import { User } from "../models/User";
 const router = Router();
 
 router.use("/ping", (_, res) => {
-  res.send("pong");
+  res.json({
+    message: "pong",
+    pid: process.pid,
+  });
 });
 
 router.post("/logout", (req, res, next) => {
