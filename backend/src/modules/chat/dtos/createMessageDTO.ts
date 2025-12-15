@@ -2,9 +2,6 @@ import { IsString, MinLength } from "class-validator";
 
 class CreateMessageDTO implements ICreateMessageDTO {
   @IsString()
-  from!: string;
-
-  @IsString()
   to!: string;
 
   @IsString()
@@ -13,7 +10,6 @@ class CreateMessageDTO implements ICreateMessageDTO {
 }
 
 interface ICreateMessageDTO {
-  from: string;
   to: string;
   message: string;
 }

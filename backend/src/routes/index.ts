@@ -1,9 +1,10 @@
+import passport from "passport";
 import { Router } from "express";
-import { authenticateRoutes } from "./authenticate.routes";
 import { usersRoutes } from "./users.routes";
 import { isAuthenticated } from "../middleware";
-import passport from "passport";
 import { chatRoutes } from "./chat.routes";
+import { UserStatus } from "../models/UserStatus";
+import { User } from "../models/User";
 
 const router = Router();
 
@@ -12,6 +13,9 @@ router.use("/ping", (_, res) => {
 });
 
 router.post("/logout", (req, res, next) => {
+  const user = req.user as InstanceType<typeof User>;
+  UserStatus.deleteOne({ userId: user.id }).exec();
+
   req.logout((err) => {
     if (err) return next(err);
 
@@ -21,6 +25,10 @@ router.post("/logout", (req, res, next) => {
 
 router.post("/auth", passport.authenticate("local"), async (req, res) => {
   return res.status(201).json({ message: "User registered successfully" });
+});
+
+router.get("/me", isAuthenticated, (req, res) => {
+  res.json(req.user);
 });
 
 router.use(isAuthenticated);

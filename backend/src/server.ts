@@ -8,6 +8,12 @@ connectDB();
 
 const server = http.createServer(app);
 
-export const io = new Server(server, { cors: { origin: "*" } });
+export const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:3000",
+    credentials: true,
+    methods: ["GET", "POST"],
+  },
+});
 
 server.listen(3333, () => console.log("Backend rodando na porta 3333"));

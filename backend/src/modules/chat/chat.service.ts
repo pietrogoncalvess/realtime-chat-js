@@ -1,7 +1,6 @@
 import { inject, injectable } from "tsyringe";
 import { Message } from "../../models/Message";
 import { ICreateMessageDTO } from "./dtos/createMessageDTO";
-import { User } from "../../models/User";
 import { UsersService } from "../users/users.service";
 import { isValidObjectId } from "mongoose";
 import { io } from "../../server";
@@ -13,7 +12,14 @@ class ChatService {
     private readonly usersService: UsersService
   ) {}
 
-  async createMessage(data: ICreateMessageDTO) {
+  async findMessagesByChatId(chatId: string): Promise<InstanceType<typeof Message>[]> {
+    const messages = await Message.find({
+      $or: [{ to: chatId }, { from: chatId }],
+    }).sort({ createdAt: 1 });
+    return messages;
+  }
+
+  async createMessage(data: ICreateMessageDTO & { from: string }) {
     const isValidIds = isValidObjectId(data.from) && isValidObjectId(data.to) && data.from !== data.to;
 
     if (!isValidIds) {

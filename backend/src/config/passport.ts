@@ -36,8 +36,6 @@ passport.serializeUser((user: any, done) => {
 passport.deserializeUser((id: string, done) => {
   User.findById(id)
     .then((user) => {
-      UserStatus.deleteOne({ userId: id }).exec();
-
       done(null, user);
     })
     .catch((err) => done(err));

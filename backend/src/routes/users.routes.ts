@@ -6,6 +6,8 @@ const usersController = container.resolve(UsersController);
 
 const usersRoutes = Router();
 
+usersRoutes.get("/", usersController.findAll.bind(usersController));
+usersRoutes.get("/online", usersController.findOnline.bind(usersController));
 usersRoutes.post("/", usersController.create.bind(usersController));
 
 export { usersRoutes };

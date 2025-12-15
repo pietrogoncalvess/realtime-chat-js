@@ -22,6 +22,24 @@ class UsersController {
       return response.status(400).json({ message: (error as Error).message });
     }
   }
+
+  async findAll(request: Request, response: Response): Promise<Response> {
+    try {
+      const users = await this.usersService.findAll();
+      return response.status(200).json(users);
+    } catch (error) {
+      return response.status(400).json({ message: (error as Error).message });
+    }
+  }
+
+  async findOnline(request: Request, response: Response): Promise<Response> {
+    try {
+      const users = await this.usersService.findOnline();
+      return response.status(200).json(users);
+    } catch (error) {
+      return response.status(400).json({ message: (error as Error).message });
+    }
+  }
 }
 
 export { UsersController };
