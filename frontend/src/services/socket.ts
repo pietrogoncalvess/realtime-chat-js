@@ -1,6 +1,7 @@
 import { io } from "socket.io-client";
 
 export const socket = io("http://localhost:3333", {
-  withCredentials: true,
+  withCredentials: false,
   autoConnect: false,
+  transports: ["websocket"],
 });

@@ -41,7 +41,9 @@ export function MessageInterface() {
     getMeInfo();
 
     socket.connect();
-    socket.off("receive_message");
+    socket.on("connect", () => {
+      console.log("Conectado ao servidor de WebSocket");
+    });
     socket.on("receive_message", (data: Message) => {
       if (!meRef.current || !selectedChatRef.current) return;
 
@@ -94,7 +96,6 @@ export function MessageInterface() {
       meRef.current = me.data;
       setIsAuthenticated(true);
     } catch (err) {
-      console.log("Error fetching me info, redirecting to login");
       router.replace("/");
       console.log(err);
     }

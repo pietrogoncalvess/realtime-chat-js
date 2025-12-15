@@ -35,7 +35,7 @@ class ChatService {
     const message = Message.create(data);
 
     const io = getSocketServer();
-    io.emit("receive_message", data);
+    const socketRes = io.emit("receive_message", data);
 
     return message;
   }

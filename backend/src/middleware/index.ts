@@ -5,5 +5,5 @@ export function isAuthenticated(req: Request, res: Response, next: NextFunction)
     return next();
   }
 
-  return res.status(401).json({ message: "Não autenticado" });
+  return res.status(401).json({ message: "Unauthenticated" });
 }

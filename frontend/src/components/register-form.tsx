@@ -5,32 +5,35 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, ArrowRight, User } from "lucide-react";
 import Link from "next/link";
 import axios from "axios";
-import { socket } from "@/services/socket";
 
-export function LoginForm() {
+export function RegisterForm() {
   const router = useRouter();
 
+  const [name, setName] = React.useState("");
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [showPassword, setShowPassword] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(false);
 
-  async function handleLogin(e: React.FormEvent) {
+  async function handleRegister(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     setLoading(true);
 
     try {
-      const response = await axios.post("http://localhost:3333/auth", { username, password }, { withCredentials: true });
+      const response = await axios.post(
+        "http://localhost:3333/public/users/",
+        { username, password, name, secret: "secret" },
+        { withCredentials: true }
+      );
 
-      router.push("/messages");
+      router.replace("/");
     } catch (err) {
-      setError("E-mail ou senha inválidos");
+      setError("Bad request");
     } finally {
       setLoading(false);
     }
@@ -39,15 +42,30 @@ export function LoginForm() {
   return (
     <div className="relative z-10 w-full max-w-md">
       <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-8 shadow-2xl">
-        <form onSubmit={handleLogin} className="space-y-6">
+        <form onSubmit={handleRegister} className="space-y-6">
           <div className="text-center space-y-2">
-            <h1 className="text-3xl font-bold text-gray-900">Acesse sua conta</h1>
-            <p className="text-gray-500">Insira suas credenciais para fazer login</p>
+            <h1 className="text-3xl font-bold text-gray-900">Crie sua conta</h1>
+            <p className="text-gray-500">Insira suas credenciais para criar uma conta</p>
           </div>
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
+              <Label htmlFor="name">Name</Label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Input
+                  id="name"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Usuario"
+                  className="pl-10 h-12"
+                  required
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Username</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <Input
@@ -55,7 +73,7 @@ export function LoginForm() {
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  placeholder="usuario@provedor"
+                  placeholder="usuario@provedor.com"
                   className="pl-10 h-12"
                   required
                 />
@@ -88,7 +106,7 @@ export function LoginForm() {
             {error && <p className="text-sm text-red-600 text-center">{error}</p>}
 
             <Button type="submit" disabled={loading} className="w-full h-12 rounded-full">
-              {loading ? "Entrando..." : "Acessar"}
+              {loading ? "Criando..." : "Criar"}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
@@ -96,8 +114,8 @@ export function LoginForm() {
       </div>
 
       <div className="mt-6 text-center">
-        <Link href="/register" className="inline-block bg-white/90 px-8 py-3 rounded-full">
-          Criar uma nova conta
+        <Link href="/" className="inline-block bg-white/90 px-8 py-3 rounded-full">
+          Voltar
         </Link>
       </div>
     </div>
